@@ -1,0 +1,85 @@
+version: '3.4'
+
+networks:
+  my-dapr-netowork:
+
+services:
+  ############################
+  # web applications
+  ############################
+  daprwebapp:
+    build:
+      context: ./DaprWebApp
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+      - "51000:50001"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - daprrestapi
+    networks:
+      - my-dapr-netowork
+
+  daprwebapp-dapr:
+    image: "daprio/daprd:latest"
+    command: ["./daprd",
+      "-app-id", "daprwebapp",
+      "-app-port", "3000",
+      "-placement-host-address", "placement:50006",
+      "-dapr-grpc-port", "50001",
+      "-components-path", "/components"]
+    volumes:
+      - "./components/:/components"
+    depends_on:
+      - daprwebapp
+    network_mode: "service:daprwebapp"
+
+  ############################
+  # rest apis
+  ############################
+  daprrestapi:
+    build:
+      context: ./DaprRestApi
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+      - "50001:50001"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - my-dapr-netowork
+
+  daprrestapi-dapr:
+    image: "daprio/daprd:latest"
+    command: ["./daprd",
+      "-app-id", "daprrestapi",
+      "-app-port", "3001",
+      "-placement-host-address", "placement:50006",
+      "-dapr-grpc-port", "50001",
+      "-components-path", "/components"]
+    volumes:
+      - "./components/:/components"
+    depends_on:
+      - daprrestapi
+    network_mode: "service:daprrestapi"
+
+  ############################
+  # Dapr placement service
+  ############################
+  placement:
+    image: "daprio/dapr"
+    command: ["./placement", "-port", "50006"]
+    ports:
+      - "50006:50006"
+    networks:
+      - my-dapr-netowork
+  ############################
+  # Redis state store
+  ############################
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6380:6379"
+    networks:
+      - my-dapr-netowork
