@@ -1,0 +1,27 @@
+using Dapr;
+using Dapr.Client;
+using Microsoft.AspNetCore.Mvc;
+
+namespace DaprRestApi.Controllers;
+
+[ApiController]
+[Route("[controller]")]
+public class LocalStrageController : ControllerBase
+{
+    private readonly ILogger<LocalStrageController> _logger;
+    private readonly DaprClient _daprClient;
+
+    public LocalStrageController(ILogger<LocalStrageController> logger, DaprClient daprClient)
+    {
+        _logger = logger;
+        _daprClient = daprClient;
+    }
+    
+    [Topic("pubsub", "newData")]
+    [HttpPost("/localdata")]
+    public async Task Post(Data data)    
+    {
+        _logger.LogInformation("subscribed data will stored local strage");
+        // await _daprClient.InvokeBindingAsync("bindings.localstorage", "create", data);
+    }
+}
