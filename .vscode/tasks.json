@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/DaprRestApi/DaprRestApi.csproj",
+                "${workspaceFolder}/DaprWebApp/DaprWebApp.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/DaprRestApi/DaprRestApi.csproj",
+                "${workspaceFolder}/DaprWebApp/DaprWebApp.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/DaprRestApi/DaprRestApi.csproj"
+                "${workspaceFolder}/DaprWebApp/DaprWebApp.csproj"
             ],
             "problemMatcher": "$msCompile"
         }
