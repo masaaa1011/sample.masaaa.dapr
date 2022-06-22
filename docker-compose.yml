@@ -13,20 +13,27 @@ services:
       context: ./DaprWebApp
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
-      - "51000:50001"
+      - "3000:80"
+      - "3001:443"
+      - "50001:50001"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://*:80;https://*:443;
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/usr/azure_container_apps_sample/.secrets/.aspnet/https/azure_container_apps_sample.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=azure_container_apps_sample
     depends_on:
       - daprrestapi
     networks:
       - my-dapr-netowork
+    volumes:
+      - .\.secrets\:/root/.microsoft/usersecrets
+      - .\.aspnet\https:/usr/azure_container_apps_sample/.secrets/.aspnet/https/
 
   daprwebapp-dapr:
     image: "daprio/daprd:latest"
     command: ["./daprd",
       "-app-id", "daprwebapp",
-      "-app-port", "3000",
+      "-app-port", "80",
       "-placement-host-address", "placement:50006",
       "-dapr-grpc-port", "50001",
       "-components-path", "/components",
@@ -46,20 +53,25 @@ services:
       context: ./DaprRestApi
       dockerfile: Dockerfile
     ports:
-      - "3001:3001"
-      - "50001:50001"
+      - "3002:80"
+      - "3003:443"
+      - "50002:50001"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-    # depends_on:
-    #   - zipkin
+      - ASPNETCORE_URLS=http://*:80;https://*:443;
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/usr/azure_container_apps_sample/.secrets/.aspnet/https/azure_container_apps_sample.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=azure_container_apps_sample
     networks:
       - my-dapr-netowork
+    volumes:
+      - .\.secrets\:/root/.microsoft/usersecrets
+      - .\.aspnet\https:/usr/azure_container_apps_sample/.secrets/.aspnet/https/
 
   daprrestapi-dapr:
     image: "daprio/daprd:latest"
     command: ["./daprd",
       "-app-id", "daprrestapi",
-      "-app-port", "3001",
+      "-app-port", "80",
       "-placement-host-address", "placement:50006",
       "-dapr-grpc-port", "50001",
       "-components-path", "/components",
