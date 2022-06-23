@@ -9,6 +9,41 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DaprRestApi", "DaprRestApi\
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{EE7A244E-5BDD-4B26-8E0C-BF06EEDB8842}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dapr", "dapr", "{5A355FBA-8D8E-4ECC-A63F-530664099A90}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "components", "components", "{D67CC445-C530-4961-ADB6-4EAE8D56CBD0}"
+	ProjectSection(SolutionItems) = preProject
+		dapr\components\localSecretStore.yaml = dapr\components\localSecretStore.yaml
+		dapr\components\pubsub.yaml = dapr\components\pubsub.yaml
+		dapr\components\statestore.yaml = dapr\components\statestore.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "config", "config", "{3AF4770C-344C-4390-BBFA-04ACF2347D74}"
+	ProjectSection(SolutionItems) = preProject
+		dapr\config\config.yaml = dapr\config\config.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".aspnet", ".aspnet", "{F2DB48C5-0C29-4B1E-B86D-243059DA878A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "https", "https", "{0B5F2F51-2AA3-4F47-9B3B-B31663E09EE8}"
+	ProjectSection(SolutionItems) = preProject
+		.aspnet\https\azure_container_apps_sample.pfx = .aspnet\https\azure_container_apps_sample.pfx
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".secrets", ".secrets", "{08C4CEDC-F505-4C68-8782-538D16843870}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "454151fe-54c3-4f31-9e4e-e956e7da375a", "454151fe-54c3-4f31-9e4e-e956e7da375a", "{19B2F8FD-C841-4D52-A717-0580438B9C7C}"
+	ProjectSection(SolutionItems) = preProject
+		.secrets\454151fe-54c3-4f31-9e4e-e956e7da375a\secrets.json = .secrets\454151fe-54c3-4f31-9e4e-e956e7da375a\secrets.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "locals", "locals", "{AC2961BF-9423-40F5-A10B-55BB081404F7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "secrets", "secrets", "{D21E9903-A1CE-41AA-853A-519110D7C0FA}"
+	ProjectSection(SolutionItems) = preProject
+		dapr\secrets\secrets.json = dapr\secrets\secrets.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +65,13 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D67CC445-C530-4961-ADB6-4EAE8D56CBD0} = {5A355FBA-8D8E-4ECC-A63F-530664099A90}
+		{3AF4770C-344C-4390-BBFA-04ACF2347D74} = {5A355FBA-8D8E-4ECC-A63F-530664099A90}
+		{0B5F2F51-2AA3-4F47-9B3B-B31663E09EE8} = {F2DB48C5-0C29-4B1E-B86D-243059DA878A}
+		{19B2F8FD-C841-4D52-A717-0580438B9C7C} = {08C4CEDC-F505-4C68-8782-538D16843870}
+		{D21E9903-A1CE-41AA-853A-519110D7C0FA} = {5A355FBA-8D8E-4ECC-A63F-530664099A90}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9F9239B2-06EF-439F-B38B-0D38BF75F5CA}

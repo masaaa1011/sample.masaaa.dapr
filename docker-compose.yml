@@ -29,6 +29,9 @@ services:
       - .\.secrets\:/root/.microsoft/usersecrets
       - .\.aspnet\https:/usr/azure_container_apps_sample/.secrets/.aspnet/https/
 
+  ############################
+  # web applications side car
+  ############################
   daprwebapp-dapr:
     image: "daprio/daprd:latest"
     command: ["./daprd",
@@ -41,6 +44,7 @@ services:
     volumes:
       - "./dapr/components/:/components"
       - "./dapr/config/:/config"
+      - "./dapr/secrets/:/secrets"
     depends_on:
       - daprwebapp
     network_mode: "service:daprwebapp"
@@ -61,12 +65,17 @@ services:
       - ASPNETCORE_URLS=http://*:80;https://*:443;
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/usr/azure_container_apps_sample/.secrets/.aspnet/https/azure_container_apps_sample.pfx
       - ASPNETCORE_Kestrel__Certificates__Default__Password=azure_container_apps_sample
+    depends_on:
+      - broker-dapr
     networks:
       - my-dapr-netowork
     volumes:
       - .\.secrets\:/root/.microsoft/usersecrets
       - .\.aspnet\https:/usr/azure_container_apps_sample/.secrets/.aspnet/https/
 
+  ############################
+  # rest apis side car
+  ############################
   daprrestapi-dapr:
     image: "daprio/daprd:latest"
     command: ["./daprd",
@@ -79,9 +88,11 @@ services:
     volumes:
       - "./dapr/components/:/components"
       - "./dapr/config/:/config"
+      - "./dapr/secrets/:/secrets"
     depends_on:
       - daprrestapi
     network_mode: "service:daprrestapi"
+
   ############################
   # Dapr placement service
   ############################
@@ -92,6 +103,7 @@ services:
       - "50006:50006"
     networks:
       - my-dapr-netowork
+
   ############################
   # Redis state store
   ############################
@@ -101,6 +113,7 @@ services:
       - "6380:6379"
     networks:
       - my-dapr-netowork
+
   ############################
   # Metrics Zipkin
   ############################
@@ -123,9 +136,75 @@ services:
     volumes:
       - "./dapr/components/:/components"
       - "./dapr/config/:/config"
+      - "./dapr/secrets/:/secrets"
     depends_on:
       - zipkin
     network_mode: "service:zipkin"
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.0.1
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - my-dapr-netowork
+
+  zookeeper-dapr:
+    image: "daprio/daprd:latest"
+    command: ["./daprd",
+      "-app-id", "zookeeper",
+      "-app-port", "2181",
+      "-placement-host-address", "placement:50006",
+      "-dapr-grpc-port", "50001",
+      "-components-path", "/components",
+      "-config", "/config/config.yaml"]
+    volumes:
+      - "./dapr/components/:/components"
+      - "./dapr/config/:/config"
+      - "./dapr/secrets/:/secrets"
+    depends_on:
+      - zookeeper
+    network_mode: "service:zookeeper"
+
+  broker:
+    image: confluentinc/cp-kafka:7.0.1
+    container_name: broker
+    ports:
+    # To learn about configuring Kafka for access across networks see
+    # https://www.confluent.io/blog/kafka-client-cannot-connect-to-broker-on-aws-on-docker-etc/
+      - "9092:9092"
+    depends_on:
+      - zookeeper-dapr
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      AUTO_CREATE_TOPICS: true
+      KAFKA_CREATE_TOPICS: "sample_topic:1:1,checkout:1:1"
+    networks:
+      - my-dapr-netowork
+
+  broker-dapr:
+    image: "daprio/daprd:latest"
+    command: ["./daprd",
+      "-app-id", "broker",
+      "-app-port", "9092",
+      "-placement-host-address", "placement:50006",
+      "-dapr-grpc-port", "50001",
+      "-components-path", "/components",
+      "-config", "/config/config.yaml"]
+    volumes:
+      - "./dapr/components/:/components"
+      - "./dapr/config/:/config"
+      - "./dapr/secrets/:/secrets"
+    depends_on:
+      - broker
+    network_mode: "service:broker"
 
   ############################
   # cosmos-db local emulator
